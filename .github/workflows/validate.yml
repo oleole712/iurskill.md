@@ -1,0 +1,26 @@
+name: SKILL.md validieren
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Frontmatter prüfen
+
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Python einrichten
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Abhängigkeiten installieren
+        run: pip install pyyaml
+
+      - name: SKILL.md Dateien validieren
+        run: python .github/scripts/validate_skills.py
