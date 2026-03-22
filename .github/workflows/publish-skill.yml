@@ -1,0 +1,190 @@
+name: Skill veröffentlichen
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  publish:
+    if: github.event.label.name == 'approved'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+
+    steps:
+      - name: Skills-Repo auschecken
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PUBLISH_TOKEN }}
+
+      - name: Issue-Inhalt parsen
+        id: parse
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.issue.body || '';
+
+            const skillMatch = body.match(/```markdown\n([\s\S]*?)```/);
+            if (!skillMatch) {
+              core.setFailed('Kein SKILL.md-Inhalt im Issue gefunden.');
+              return;
+            }
+            const skillContent = skillMatch[1];
+
+            const nameMatch    = skillContent.match(/^name:\s*(.+)$/m);
+            const descMatch    = skillContent.match(/^description:\s*(.+)$/m);
+            const versionMatch = skillContent.match(/^version:\s*["']?(.+?)["']?$/m);
+            const authorMatch  = body.match(/\*\*Autor:in:\*\*\s*(.+)/);
+            const rgMatch      = skillContent.match(/rechtsgebiet:\s*(.+)/);
+            const tagsMatch    = skillContent.match(/tags:\s*\[(.+)\]/);
+            const chipsMatch   = skillContent.match(/chips:\s*\[(.+)\]/);
+
+            const name        = nameMatch    ? nameMatch[1].trim()    : 'Unbekannt';
+            const description = descMatch    ? descMatch[1].trim()    : '';
+            const version     = versionMatch ? versionMatch[1].trim() : '1.0';
+            const author      = authorMatch  ? authorMatch[1].trim().replace(/^—\s*/, '') : 'Community';
+            const rg          = rgMatch      ? rgMatch[1].trim()      : 'Allgemein';
+            const tagsRaw     = tagsMatch    ? tagsMatch[1]           : rg;
+            const tags        = tagsRaw.split(',').map(t => t.trim().replace(/['"]/g, '')).filter(Boolean);
+            const chips       = chipsMatch
+              ? chipsMatch[1].split(',').map(t => t.trim().replace(/['"]/g, '')).filter(Boolean)
+              : tags.slice(0, 3);
+
+            const id = name
+              .toLowerCase()
+              .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '');
+
+            const shortDesc = description.split(/[.!?]/)[0].trim().substring(0, 120);
+            const today = new Date();
+            const added = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+
+            core.setOutput('skill_content',     skillContent);
+            core.setOutput('skill_id',          id);
+            core.setOutput('skill_name',        name);
+            core.setOutput('skill_description', description);
+            core.setOutput('skill_short_desc',  shortDesc);
+            core.setOutput('skill_version',     version);
+            core.setOutput('skill_author',      author);
+            core.setOutput('skill_rechtsgebiet',rg);
+            core.setOutput('skill_tags',        JSON.stringify(tags));
+            core.setOutput('skill_chips',       JSON.stringify(chips));
+            core.setOutput('skill_added',       added.toString());
+            console.log(`Skill: ${name} (${id})`);
+
+      - name: SKILL.md ins Skills-Repo schreiben
+        env:
+          SKILL_ID: ${{ steps.parse.outputs.skill_id }}
+          SKILL_CONTENT: ${{ steps.parse.outputs.skill_content }}
+        run: |
+          mkdir -p "skills/$SKILL_ID"
+          printf '%s' "$SKILL_CONTENT" > "skills/$SKILL_ID/SKILL.md"
+
+      - name: Commit SKILL.md (nur bei Änderungen)
+        run: |
+          git config user.name "iurskill-bot"
+          git config user.email "hallo@iurskill.md"
+          git add "skills/${{ steps.parse.outputs.skill_id }}/SKILL.md"
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen in SKILL.md – überspringe Commit."
+          else
+            git commit -m "Skill veröffentlicht: ${{ steps.parse.outputs.skill_name }}"
+            git push
+          fi
+
+      - name: iurskill-web auschecken
+        uses: actions/checkout@v4
+        with:
+          repository: oleole712/iurskill-web
+          token: ${{ secrets.PUBLISH_TOKEN }}
+          path: iurskill-web
+
+      - name: Skill in index.html eintragen
+        env:
+          SKILL_ID:          ${{ steps.parse.outputs.skill_id }}
+          SKILL_NAME:        ${{ steps.parse.outputs.skill_name }}
+          SKILL_DESC:        ${{ steps.parse.outputs.skill_description }}
+          SKILL_SHORT:       ${{ steps.parse.outputs.skill_short_desc }}
+          SKILL_VERSION:     ${{ steps.parse.outputs.skill_version }}
+          SKILL_AUTHOR:      ${{ steps.parse.outputs.skill_author }}
+          SKILL_RECHTSGEBIET:${{ steps.parse.outputs.skill_rechtsgebiet }}
+          SKILL_TAGS:        ${{ steps.parse.outputs.skill_tags }}
+          SKILL_CHIPS:       ${{ steps.parse.outputs.skill_chips }}
+          SKILL_ADDED:       ${{ steps.parse.outputs.skill_added }}
+        run: |
+          python3 << 'EOF'
+          import os, json, re
+
+          id    = os.environ['SKILL_ID']
+          name  = os.environ['SKILL_NAME']
+          desc  = os.environ['SKILL_DESC'].replace("'", "\\'").replace('"', '\\"')
+          short = os.environ['SKILL_SHORT'].replace("'", "\\'")
+          ver   = os.environ['SKILL_VERSION']
+          auth  = os.environ['SKILL_AUTHOR']
+          rg    = os.environ['SKILL_RECHTSGEBIET']
+          tags  = json.loads(os.environ['SKILL_TAGS'])
+          chips = json.loads(os.environ['SKILL_CHIPS'])
+          added = os.environ['SKILL_ADDED']
+
+          gh_url  = f"https://github.com/oleole712/iurskill.md/blob/main/skills/{id}/SKILL.md"
+          raw_url = f"https://raw.githubusercontent.com/oleole712/iurskill.md/main/skills/{id}/SKILL.md"
+
+          new_entry = (
+            f"  {{ id:'{id}', added: {added}, name:'{name}', rechtsgebiet:'{rg}', "
+            f"tags:{json.dumps(tags, ensure_ascii=False)}, "
+            f"chips:{json.dumps(chips, ensure_ascii=False)}, "
+            f"version:'{ver}', author:'{auth}', "
+            f"description:'{desc}', shortDesc:'{short}', "
+            f"ghUrl:'{gh_url}', rawUrl:'{raw_url}', upvotes:0 }}"
+          )
+
+          with open('iurskill-web/index.html', 'r', encoding='utf-8') as f:
+              html = f.read()
+
+          if f"id:'{id}'" in html:
+              print(f"Skill {id} bereits vorhanden – überspringe.")
+          else:
+              # Vor dem letzten Eintrag im SKILLS-Array einfügen
+              html = re.sub(
+                r'(\n\s*\}\s*\n\];(\s*\n\s*let currentView))',
+                f'\n  }},\n{new_entry}\\2',
+                html, count=1
+              )
+              with open('iurskill-web/index.html', 'w', encoding='utf-8') as f:
+                  f.write(html)
+              print(f"Skill {id} erfolgreich eingetragen.")
+          EOF
+
+      - name: Commit index.html (nur bei Änderungen)
+        working-directory: iurskill-web
+        run: |
+          git config user.name "iurskill-bot"
+          git config user.email "hallo@iurskill.md"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen in index.html – überspringe Commit."
+          else
+            git commit -m "Website: Skill hinzugefügt – ${{ steps.parse.outputs.skill_name }}"
+            git push
+          fi
+
+      - name: Issue kommentieren und schließen
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const id   = '${{ steps.parse.outputs.skill_id }}';
+            const name = '${{ steps.parse.outputs.skill_name }}';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: `✅ **${name}** wurde veröffentlicht und ist jetzt auf [iurskill.md](https://iurskill.md) verfügbar.\n\nSkill-Pfad: \`skills/${id}/SKILL.md\``
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed'
+            });
