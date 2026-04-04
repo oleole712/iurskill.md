@@ -188,3 +188,51 @@ Wichtige Einzelfristen:
 
 ## Ausgabeformat
 
+```
+## Fristenberechnung
+
+**Fristtyp:** [z. B. Berufungsfrist nach § 517 ZPO]
+**Rechtsgebiet:** [z. B. Zivilprozessrecht]
+**Auslösendes Ereignis:** [z. B. Zustellung des Urteils am 15.01.2026]
+
+---
+
+### Anwendbare Normen
+[Verweisungskette, z. B.: § 222 Abs. 1 ZPO → §§ 187, 188 Abs. 2, 193 BGB]
+
+### Rechenweg
+
+1. Ereignis: 15.01.2026
+2. Fristbeginn: 16.01.2026 (§ 187 Abs. 1 BGB)
+3. Fristdauer: 1 Monat (§ 517 ZPO)
+4. Rechnerisches Ende: 16.02.2026 (§ 188 Abs. 2 BGB)
+5. Wochentag: Montag → kein Verschiebungsbedarf (§ 193 BGB)
+
+**Fristende: 16.02.2026**
+
+---
+
+> ⚠️ Diese Berechnung ersetzt keine anwaltliche Beratung. Bitte eigenverantwortlich prüfen.
+```
+
+---
+
+## Anweisungen
+
+1. **Rechtsgebiet zuerst klären** – das bestimmt die Verweisungskette.
+2. **Verweisungsnorm benennen** – immer die Brücke vom Verfahrensgesetz zu §§ 187–193 BGB
+   angeben (oder bei StPO auf § 43 StPO hinweisen).
+3. **Jeden Rechenschritt explizit dokumentieren** – Norm + Datum + Begründung.
+4. **Feiertagsprüfung nicht vergessen** – bei Unklarheit nach Bundesland fragen;
+   bundeseinheitliche Feiertage (§ 193 BGB i. V. m. den Feiertagsgesetzen der Länder)
+   sind stets zu berücksichtigen.
+5. **Haftungshinweis immer ausgeben** – keine Ausnahme.
+6. **Bei mehreren Fristen:** Alle tabellarisch auflisten, dann einzeln ausrechnen.
+
+## Sonderfälle
+
+- **KSchG § 4:** Ausschlussfrist – keine Wiedereinsetzung; besonders deutlich markieren.
+- **AO § 122 Abs. 2:** Bekanntgabefiktion (+3 Tage) vor Fristbeginn einrechnen.
+- **Versäumte Frist:** Stets auf Wiedereinsetzungsmöglichkeit hinweisen:
+  §§ 233 ff. ZPO / § 60 VwGO / § 44 StPO / § 56 FGO / § 67 SGG / § 233 ZPO i. V. m. ArbGG.
+- **EU-Recht / EuGVVO:** Bei grenzüberschreitendem Bezug gesondert prüfen.
