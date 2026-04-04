@@ -10,7 +10,7 @@ Skills sind Markdown-Dateien, die KI-Agenten wie Claude, Open WebUI oder andere 
 
 ## Skills in dieser Bibliothek
 
-Alle verfügbaren Skills findest du auf [iurskill.md](https://iurskill.md). Versierte Nutzer finden sie auch direkt im Ordner [`skills/`](./skills/).
+Alle verfügbaren Skills findest du auf [iurskill.md](https://iurskill.md) — oder direkt im Ordner [`skills/`](./skills/).
 
 ---
 
