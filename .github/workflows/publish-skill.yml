@@ -14,7 +14,7 @@ jobs:
 
     steps:
       - name: Skills-Repo auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.PUBLISH_TOKEN }}
 
@@ -95,7 +95,7 @@ jobs:
           fi
 
       - name: iurskill-web auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: oleole712/iurskill-web
           token: ${{ secrets.PUBLISH_TOKEN }}
