@@ -37,15 +37,34 @@ jobs:
             const descMatch    = skillContent.match(/^description:\s*(.+)$/m);
             const versionMatch = skillContent.match(/^version:\s*["']?(.+?)["']?$/m);
             const authorMatch  = body.match(/\*\*Autor:in:\*\*\s*(.+)/);
+            const linkedinMatch = body.match(/\*\*LinkedIn:\*\*\s*(https:\/\/[^\s\n]+)/);
             const rgMatch      = skillContent.match(/rechtsgebiet:\s*(.+)/);
             const tagsMatch    = skillContent.match(/tags:\s*\[(.+)\]/);
             const chipsMatch   = skillContent.match(/chips:\s*\[(.+)\]/);
 
-            const name        = nameMatch    ? nameMatch[1].trim()    : 'Unbekannt';
-            const description = descMatch    ? descMatch[1].trim()    : '';
+            // Fix 4: Capitalize first letter
+            const rawName     = nameMatch ? nameMatch[1].trim() : 'Unbekannt';
+            const name        = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+
+            // Fix 3: handle YAML multiline description (> or |)
+            let description = '';
+            if (descMatch) {
+              const raw = descMatch[1].trim();
+              if (raw === '>' || raw === '|') {
+                const multiMatch = skillContent.match(/description:\s*[>|]\n((?:[ \t]+.+\n?)+)/);
+                description = multiMatch ? multiMatch[1].replace(/^[ \t]+/gm, '').replace(/\n/g, ' ').trim() : '';
+              } else {
+                description = raw;
+              }
+            }
+
             const version     = versionMatch ? versionMatch[1].trim() : '1.0';
             const author      = authorMatch  ? authorMatch[1].trim().replace(/^—\s*/, '') : 'Community';
-            const rg          = rgMatch      ? rgMatch[1].trim()      : 'Allgemein';
+            const linkedin    = linkedinMatch ? linkedinMatch[1].trim() : '';
+
+            // Fix 2: only first rechtsgebiet value
+            const rgRaw       = rgMatch ? rgMatch[1].trim() : 'Allgemein';
+            const rg          = rgRaw.split(/[,[]/)[0].replace(/['"\]]/g, '').trim() || 'Allgemein';
             const tagsRaw     = tagsMatch    ? tagsMatch[1]           : rg;
             const tags        = tagsRaw.split(',').map(t => t.trim().replace(/['"]/g, '')).filter(Boolean);
             const chips       = chipsMatch
@@ -69,6 +88,7 @@ jobs:
             core.setOutput('skill_short_desc',  shortDesc);
             core.setOutput('skill_version',     version);
             core.setOutput('skill_author',      author);
+            core.setOutput('skill_linkedin',    linkedin);
             core.setOutput('skill_rechtsgebiet',rg);
             core.setOutput('skill_tags',        JSON.stringify(tags));
             core.setOutput('skill_chips',       JSON.stringify(chips));
@@ -109,6 +129,7 @@ jobs:
           SKILL_DESC:        ${{ steps.parse.outputs.skill_description }}
           SKILL_SHORT:       ${{ steps.parse.outputs.skill_short_desc }}
           SKILL_AUTHOR:      ${{ steps.parse.outputs.skill_author }}
+          SKILL_LINKEDIN:    ${{ steps.parse.outputs.skill_linkedin }}
           SKILL_RECHTSGEBIET: ${{ steps.parse.outputs.skill_rechtsgebiet }}
           SKILL_TAGS:        ${{ steps.parse.outputs.skill_tags }}
           SKILL_CHIPS:       ${{ steps.parse.outputs.skill_chips }}
@@ -121,6 +142,7 @@ jobs:
           desc  = os.environ['SKILL_DESC'].replace("'", "\\'").replace('"', '\\"')
           short = os.environ['SKILL_SHORT'].replace("'", "\\'")
           auth  = os.environ['SKILL_AUTHOR']
+          linkedin = os.environ.get('SKILL_LINKEDIN', '')
           rg    = os.environ['SKILL_RECHTSGEBIET']
           tags  = json.loads(os.environ['SKILL_TAGS'])
           chips = json.loads(os.environ['SKILL_CHIPS'])
@@ -133,6 +155,7 @@ jobs:
             f"tags:{json.dumps(tags, ensure_ascii=False)}, "
             f"chips:{json.dumps(chips, ensure_ascii=False)}, "
             f"author:'{auth}', "
+            f"linkedin:'{linkedin}', "
             f"shortDesc:'{short}', "
             f"ghUrl:'{gh_url}', rawUrl:'{raw_url}' }}"
           )
