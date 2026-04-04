@@ -108,7 +108,7 @@ jobs:
           SKILL_DESC:        ${{ steps.parse.outputs.skill_description }}
           SKILL_SHORT:       ${{ steps.parse.outputs.skill_short_desc }}
           SKILL_AUTHOR:      ${{ steps.parse.outputs.skill_author }}
-          SKILL_RECHTSGEBIET:${{ steps.parse.outputs.skill_rechtsgebiet }}
+          SKILL_RECHTSGEBIET: ${{ steps.parse.outputs.skill_rechtsgebiet }}
           SKILL_TAGS:        ${{ steps.parse.outputs.skill_tags }}
           SKILL_CHIPS:       ${{ steps.parse.outputs.skill_chips }}
         run: |
