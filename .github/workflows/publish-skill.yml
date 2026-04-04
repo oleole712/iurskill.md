@@ -140,9 +140,13 @@ jobs:
               html = f.read()
 
           if f"id:'{id}'" in html:
-              print(f"Skill {id} bereits vorhanden – überspringe.")
+              # Skill-ID existiert bereits — Abbruch mit Fehlermeldung
+              print(f"FEHLER: Skill-ID '{id}' existiert bereits in index.html.")
+              print(f"Bitte prüfe ob dies ein Duplikat ist. Falls du den bestehenden Skill")
+              print(f"aktualisieren möchtest, entferne ihn zunächst manuell aus index.html.")
+              raise SystemExit(1)
           else:
-              # Vor dem letzten Eintrag im SKILLS-Array einfügen
+              # Neuer Skill — vor dem letzten Eintrag im SKILLS-Array einfügen
               html = re.sub(
                 r'(\n\s*\}\s*\n\];(\s*\n\s*let currentView))',
                 f'\n  }},\n{new_entry}\\2',
