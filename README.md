@@ -2,19 +2,15 @@
 
 **Offene Bibliothek wiederverwendbarer Skills für KI-Tools – ausgerichtet auf deutsches Recht.**
 
-Skills sind Markdown-Dateien, die KI-Agenten wie Claude, Open WebUI oder andere Plattformen mit juristischem Fachwissen und strukturierten Arbeitsabläufen ausstatten. Jeder Skill löst eine konkrete, wiederholbare Aufgabe – von der Fristenberechnung bis zur Urteilsanalyse.
+Skills sind Markdown-Dateien, die KI-Agenten wie Claude, Open WebUI oder andere Plattformen mit juristischem Fachwissen und strukturierten Arbeitsabläufen ausstatten. Jeder Skill löst eine konkrete, wiederholbare Aufgabe — von der Fristenberechnung bis zur Urteilsanalyse.
 
-→ **Website:** [iurskill.md](https://iurskill.md)
+→ Website: [iurskill.md](https://iurskill.md)
 
 ---
 
 ## Skills in dieser Bibliothek
 
-| Skill | Rechtsgebiet | Beschreibung |
-|---|---|---|
-| [Fristenberechnung](skills/fristenberechnung/SKILL.md) | Prozessrecht | Berechnet juristische Fristen nach ZPO, VwGO, StPO, FGO, SGG und ArbGG |
-| [Urteilszusammenfassung](skills/urteilszusammenfassung/SKILL.md) | Prozessrecht / Recherche | Erstellt strukturierte Zusammenfassungen von Gerichtsurteilen |
-| [Gutachtenstil-Checker](skills/gutachtenstil-checker/SKILL.md) | Ausbildung / Methodik | Prüft juristische Texte auf korrekten Gutachtenstil |
+Alle verfügbaren Skills findest du auf [iurskill.md](https://iurskill.md). Versierte Nutzer finden sie auch direkt im Ordner [`skills/`](./skills/).
 
 ---
 
@@ -22,7 +18,7 @@ Skills sind Markdown-Dateien, die KI-Agenten wie Claude, Open WebUI oder andere 
 
 1. Öffne den gewünschten Skill-Ordner und lade die `SKILL.md` herunter
 2. Lade die Datei in deinen KI-Agenten (z. B. Claude, Open WebUI)
-3. Stelle deine juristische Frage – der Agent aktiviert den Skill automatisch
+3. Stelle deine juristische Frage — der Agent aktiviert den Skill automatisch
 
 Detaillierte Anleitungen für verschiedene Plattformen findest du auf der [FAQ-Seite](https://iurskill.md/faq).
 
@@ -30,7 +26,13 @@ Detaillierte Anleitungen für verschiedene Plattformen findest du auf der [FAQ-S
 
 ## Eigenen Skill einreichen
 
-Alle Informationen zum Einreichen eines Skills: [CONTRIBUTING.md](CONTRIBUTING.md)
+Du hast zwei Möglichkeiten:
+
+**Option 1 — Formular (empfohlen, kein GitHub-Konto nötig):**  
+Reiche deinen Skill direkt über das Formular auf [iurskill.md](https://iurskill.md) ein. Du erhältst eine Bestätigungs-E-Mail, danach wird der Skill geprüft und bei Freigabe veröffentlicht.
+
+**Option 2 — GitHub Pull Request:**  
+Alle Informationen dazu in der [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 Kurz zusammengefasst:
 1. Fork dieses Repository
@@ -67,8 +69,8 @@ Die vollständige Spezifikation: [agentskills.io/specification](https://agentski
 
 ## Lizenzen
 
-- **Skills (Inhalte):** [CC-BY-4.0](LICENSE-CONTENT) – frei nutzbar mit Namensnennung
-- **Code (GitHub Actions, Scripts):** [MIT](LICENSE)
+- **Skills (Inhalte):** [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/) – frei nutzbar mit Namensnennung
+- **Code (GitHub Actions, Scripts):** [MIT](./LICENSE)
 
 ---
 
