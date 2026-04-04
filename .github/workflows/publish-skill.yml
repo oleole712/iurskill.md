@@ -6,7 +6,7 @@ on:
 
 jobs:
   publish:
-    if: github.event.label.name == 'approved'
+    if: ${{ github.event.label.name == 'approved' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -107,12 +107,10 @@ jobs:
           SKILL_NAME:        ${{ steps.parse.outputs.skill_name }}
           SKILL_DESC:        ${{ steps.parse.outputs.skill_description }}
           SKILL_SHORT:       ${{ steps.parse.outputs.skill_short_desc }}
-          SKILL_VERSION:     ${{ steps.parse.outputs.skill_version }}
           SKILL_AUTHOR:      ${{ steps.parse.outputs.skill_author }}
           SKILL_RECHTSGEBIET:${{ steps.parse.outputs.skill_rechtsgebiet }}
           SKILL_TAGS:        ${{ steps.parse.outputs.skill_tags }}
           SKILL_CHIPS:       ${{ steps.parse.outputs.skill_chips }}
-          SKILL_ADDED:       ${{ steps.parse.outputs.skill_added }}
         run: |
           python3 << 'EOF'
           import os, json, re
@@ -121,23 +119,21 @@ jobs:
           name  = os.environ['SKILL_NAME']
           desc  = os.environ['SKILL_DESC'].replace("'", "\\'").replace('"', '\\"')
           short = os.environ['SKILL_SHORT'].replace("'", "\\'")
-          ver   = os.environ['SKILL_VERSION']
           auth  = os.environ['SKILL_AUTHOR']
           rg    = os.environ['SKILL_RECHTSGEBIET']
           tags  = json.loads(os.environ['SKILL_TAGS'])
           chips = json.loads(os.environ['SKILL_CHIPS'])
-          added = os.environ['SKILL_ADDED']
 
           gh_url  = f"https://github.com/oleole712/iurskill.md/blob/main/skills/{id}/SKILL.md"
           raw_url = f"https://raw.githubusercontent.com/oleole712/iurskill.md/main/skills/{id}/SKILL.md"
 
           new_entry = (
-            f"  {{ id:'{id}', added: {added}, name:'{name}', rechtsgebiet:'{rg}', "
+            f"  {{ id:'{id}', name:'{name}', rechtsgebiet:'{rg}', "
             f"tags:{json.dumps(tags, ensure_ascii=False)}, "
             f"chips:{json.dumps(chips, ensure_ascii=False)}, "
-            f"version:'{ver}', author:'{auth}', "
-            f"description:'{desc}', shortDesc:'{short}', "
-            f"ghUrl:'{gh_url}', rawUrl:'{raw_url}', upvotes:0 }}"
+            f"author:'{auth}', "
+            f"shortDesc:'{short}', "
+            f"ghUrl:'{gh_url}', rawUrl:'{raw_url}' }}"
           )
 
           with open('iurskill-web/index.html', 'r', encoding='utf-8') as f:
